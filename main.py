@@ -10,12 +10,14 @@ ruta_facil = "Facil.vrp"
 ruta_medio = "Medio.vrp"
 ruta_dificil = "Dificil.vrp"
 
-capacidad, dimension, coords, demandas, dist = leer_vrp(ruta_dificil)
+capacidad, dimension, coords, demandas, dist = leer_vrp(ruta_medio)
 
 def solucion_inicial(capacidad, demandas):
     sol = []
     ruta_actual = [0]  
     carga_actual = 0
+    clientes = list(range(1, len(demandas)))
+    random.shuffle(clientes)
 
     for nodo in range(1, len(demandas)):
         demanda = demandas[nodo]
