@@ -2,6 +2,7 @@ import random
 import os
 import math
 from lector import leer_vrp
+import time
 
 print(os.listdir())
 
@@ -10,7 +11,7 @@ ruta_facil = "Facil.vrp"
 ruta_medio = "Medio.vrp"
 ruta_dificil = "Dificil.vrp"
 
-capacidad, dimension, coords, demandas, dist = leer_vrp(ruta_medio)
+capacidad, dimension, coords, demandas, dist = leer_vrp(ruta_facil)
 
 def solucion_inicial(capacidad, demandas):
     sol = []
@@ -19,7 +20,7 @@ def solucion_inicial(capacidad, demandas):
     clientes = list(range(1, len(demandas)))
     random.shuffle(clientes)
 
-    for nodo in range(1, len(demandas)):
+    for nodo in clientes:
         demanda = demandas[nodo]
 
         if carga_actual + demanda > capacidad:
@@ -37,12 +38,7 @@ def solucion_inicial(capacidad, demandas):
 
     return sol
 
-# imprimir para verificar
-print("Capacidad:", capacidad)
-print("Dimension:", dimension)
-print("Primeras coordenadas:", coords[:5])
-print("Primeras demandas:", demandas[:10])
-print("Distancia 1→2:", dist[0][1])
+tiempo_inicio = time.time()
 
 # hay exceso?
 def exceso_capacidad(sol, capacidad, demandas):
@@ -97,28 +93,39 @@ max_iter = 1000000
 i = 0
 
 mejor = sol
-costo_mejor = costo(sol, capacidad, demandas)
+costo_actual = costo(sol, capacidad, demandas)
+costo_mejor = costo_actual
 
-# busqueda
 while temp > temp_min and i < max_iter:
+
     s2 = vecino(sol)
+    costo_vecino = costo(s2, capacidad, demandas)
 
-    delta = costo(s2, capacidad, demandas) - costo(sol, capacidad, demandas)
+    delta = costo_vecino - costo_actual
 
-    # print(f"iteración {i}: costo actual {costo(sol)}, costo vecino {costo(s2)}, temp {temp:.4f}")
+    if i % 5000 == 0:
+        print(f"iter {i}: actual={costo_actual}, vecino={costo_vecino}, mejor={costo_mejor}, T={temp:.4f}")
 
-    if delta < 0 or random.random() < math.exp(-delta/temp):
+    if delta < 0 or random.random() < math.exp(-delta / temp):
         sol = s2
+        costo_actual = costo_vecino
 
-    if costo(sol, capacidad, demandas) < costo_mejor:
+    if costo_actual < costo_mejor:
         mejor = sol
-        costo_mejor = costo(sol, capacidad, demandas)
+        costo_mejor = costo_actual
 
     temp *= alpha
     i += 1
 
-print("Mejor solución:", mejor)
+tiempo_fin = time.time()
+
+print("\n--- Rutas finales ---")
+for idx, ruta in enumerate(mejor, start=1):
+    cadena = " - ".join(str(n) for n in ruta)
+    print(f"Camión {idx}: {cadena}")
+
 print("Costo:", costo_mejor)
 print("Exceso de capacidad:", exceso_capacidad(mejor, capacidad, demandas))
 print("Número de rutas:", len(mejor))
 print("Iteraciones:", i)
+print("Tiempo total: ", tiempo_fin - tiempo_inicio)
