@@ -93,7 +93,7 @@ def vecino(sol):
 alpha = 0.9999
 temp = 1000
 temp_min = 0.001
-max_iter = 100000
+max_iter = 1000000
 i = 0
 
 mejor = sol
@@ -119,3 +119,6 @@ while temp > temp_min and i < max_iter:
 
 print("Mejor solución:", mejor)
 print("Costo:", costo_mejor)
+print("Exceso de capacidad:", exceso_capacidad(mejor, capacidad, demandas))
+print("Número de rutas:", len(mejor))
+print("Iteraciones:", i)
